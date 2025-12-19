@@ -1,0 +1,122 @@
+﻿@{
+    ViewData ["Title"] = "Student Enrollment";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-gradient bg-success text-white">
+                    <h3 class="mb-0 fs-4"><i class="bi bi-journal-check me-2"></i> Enroll Student</h3>
+                </div>
+                <div class="card-body p-4">
+
+                    <div id="alertBox" class="alert d-none rounded-3" role="alert"></div>
+
+                    <form id="enrollmentForm">
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Select Student</label>
+                            <select id="studentId" class="form-select form-select-lg" asp-items="ViewBag.Students">
+                                <option value="">-- Choose a Student --</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Select Course</label>
+                            <select id="courseId" class="form-select form-select-lg" asp-items="ViewBag.Courses">
+                                <option value="">-- Choose a Course --</option>
+                            </select>
+                            <div class="mt-2 text-end">
+                                <span id="slotsBadge" class="badge bg-secondary d-none">
+                                    Available Slots: <span id="slotsCount">0</span>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg" id="btnEnroll">
+                                <i class="bi bi-check-circle-fill me-2"></i> Enroll Now
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+            $('#courseId').change(function() {
+                var courseId = $(this).val();
+                var badge = $('#slotsBadge');
+                var countSpan = $('#slotsCount');
+
+                if(courseId) {
+                    $.get('/Enrollment/GetCourseSlots?courseId=' + courseId, function(data){
+                        countSpan.text(data.availableSlots);
+                        badge.removeClass('d-none bg-danger bg-warning bg-success');
+
+                        if(data.availableSlots == 0) badge.addClass('bg-danger');
+                        else if(data.availableSlots < 3) badge.addClass('bg-warning text-dark');
+                        else badge.addClass('bg-secondary');
+                    });
+                } else {
+                    badge.addClass('d-none');
+                }
+            });
+
+            $('#enrollmentForm').submit(function (e) {
+                e.preventDefault(); 
+
+                var enrollmentData = {
+                    studentId: $('#studentId').val(), 
+                    courseId: $('#courseId').val()
+                };
+
+                if (!enrollmentData.studentId || !enrollmentData.courseId) {
+                    showAlert('Please select both a student and a course.', 'warning');
+                    return;
+                }
+
+                var btn = $('#btnEnroll');
+                var originalText = btn.html();
+                btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...');
+
+                $.ajax({
+                    url: '/Enrollment/Enroll',
+                    type: 'POST',
+                    contentType: 'application/json', 
+                    data: JSON.stringify(enrollmentData),
+                    success: function (response) {
+                        showAlert(response.message, 'success');
+                        btn.prop('disabled', false).html(originalText);
+
+                        $('#courseId').trigger('change');
+                    },
+                    error: function (xhr) {
+                        var msg = xhr.responseJSON ? xhr.responseJSON.message : 'Something went wrong!';
+                        showAlert(msg, 'danger');
+                        btn.prop('disabled', false).html(originalText);
+                    }
+                });
+            });
+
+            function showAlert(message, type) {
+                var alertBox = $('#alertBox');
+                alertBox.removeClass('d-none alert-success alert-danger alert-warning')
+                        .addClass('alert-' + type)
+                        .html(type === 'success' ? '<i class="bi bi-check-circle me-2"></i>' + message : '<i class="bi bi-exclamation-triangle me-2"></i>' + message);
+
+                if(type === 'success') {
+                    setTimeout(() => alertBox.addClass('d-none'), 5000);
+                }
+            }
+        });
+    </script>
+}

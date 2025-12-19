@@ -3,7 +3,8 @@ using CodeZone.Core.Common;
 using CodeZone.Core.Entities;
 using CodeZone.Core.Interfaces;
 using FluentValidation;
-
+using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 namespace CodeZone.Services
 {
     public abstract class BaseService<TEntity, TResponse, TAddReq, TUpdateReq>
@@ -13,7 +14,7 @@ namespace CodeZone.Services
         protected readonly IMapper _mapper; 
         protected readonly IValidator<TAddReq> _addValidator;
         protected readonly IValidator<TUpdateReq> _updateValidator;
-
+        protected readonly IGenericRepository<TEntity> _repository;
         public BaseService (
             IUnitOfWork unitOfWork,
             IMapper mapper,
@@ -23,7 +24,8 @@ namespace CodeZone.Services
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _addValidator = addValidator;
-            _updateValidator = updateValidator;
+            _updateValidator = updateValidator; 
+            _repository = _unitOfWork.Repository<TEntity> ( );
         }
 
         public virtual async Task<Result<IEnumerable<TResponse>>> GetAllAsync ( )
@@ -31,6 +33,40 @@ namespace CodeZone.Services
             var entities = await _unitOfWork.Repository<TEntity> ( ).GetAllAsync ( );
             var response = _mapper.Map<IEnumerable<TResponse>> ( entities );
             return Result<IEnumerable<TResponse>>.Success ( response );
+        }
+
+
+        public virtual async Task<Result<PaginatedResult<TResponse>>> GetPaginatedListAsync (
+    Expression<Func<TEntity, bool>> filter = null,
+    int pageNumber = 1,
+    int pageSize = 10 )
+        {
+            try
+            {
+                var query = _repository.GetTableNoTracking ( );
+
+                if ( filter != null )
+                {
+                    query = query.Where ( filter );
+                }
+
+                var totalCount = await query.CountAsync ( );
+
+                var data = await query
+                    .Skip ( ( pageNumber - 1 ) * pageSize )
+                    .Take ( pageSize )
+                    .ToListAsync ( );
+
+                var mappedData = _mapper.Map<List<TResponse>> ( data );
+
+                var result = new PaginatedResult<TResponse> ( mappedData, totalCount, pageNumber, pageSize );
+
+                return Result<PaginatedResult<TResponse>>.Success ( result );
+            }
+            catch ( Exception ex )
+            {
+                return Result<PaginatedResult<TResponse>>.Failure ( $"Error retrieving data: {ex.Message}" );
+            }
         }
 
         public virtual async Task<Result<TResponse>> GetByIdAsync ( int id )

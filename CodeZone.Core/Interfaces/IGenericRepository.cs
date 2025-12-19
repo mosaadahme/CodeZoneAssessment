@@ -1,4 +1,6 @@
-﻿using CodeZone.Core.Entities;
+﻿using CodeZone.Core.Common;
+using CodeZone.Core.DTOs.Students;
+using CodeZone.Core.Entities;
 using System.Linq.Expressions;
 
 namespace CodeZone.Core.Interfaces
@@ -7,6 +9,7 @@ namespace CodeZone.Core.Interfaces
     {
         Task<T> GetByIdAsync ( int id );
         Task<IEnumerable<T>> GetAllAsync ( );
+        IQueryable<T> GetTableNoTracking ( );
         Task<IEnumerable<T>> FindAsync ( Expression<Func<T, bool>> predicate );
         Task AddAsync ( T entity );
         void Update ( T entity );

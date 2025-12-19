@@ -1,4 +1,6 @@
-﻿using CodeZone.Core.Entities;
+﻿using CodeZone.Core.Common;
+using CodeZone.Core.DTOs.Students;
+using CodeZone.Core.Entities;
 using CodeZone.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
@@ -18,8 +20,9 @@ namespace CodeZone.Data.Repositories
          
 
         public async Task<IEnumerable<T>> GetAllAsync ( ) => await _context.Set<T> ( ).ToListAsync ( );
-       
 
+        public virtual IQueryable<T> GetTableNoTracking ( ) => _context.Set<T> ( ).AsNoTracking ( ).AsQueryable ( );
+         
         public async Task<IEnumerable<T>> FindAsync ( Expression<Func<T, bool>> predicate ) => await _context.Set<T> ( ).Where ( predicate ).ToListAsync ( );
         
 
@@ -33,6 +36,7 @@ namespace CodeZone.Data.Repositories
         
 
         public async Task<bool> AnyAsync ( Expression<Func<T, bool>> predicate ) => await _context.Set<T> ( ).AnyAsync ( predicate );
+
         
     }
 }

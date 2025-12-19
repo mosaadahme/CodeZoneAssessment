@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CodeZone.Core.Common;
 using CodeZone.Core.DTOs.Students;
 using CodeZone.Core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -16,16 +17,32 @@ namespace CodeZone.Web.Controllers
             _mapper = mapper;
         }
 
+        //[HttpGet]
+        //public async Task<IActionResult> Index ( )
+        //{
+        //    var result = await _studentService.GetAllAsync ( );
+
+        //    if ( result.IsSuccess )
+        //        return View ( result.Data );
+
+        //    return View ( new List<StudentResponse> ( ) );
+        //}
+
+
         [HttpGet]
-        public async Task<IActionResult> Index ( )
+        public async Task<IActionResult> Index ( string search = "", int page = 1, int pageSize = 5 )
         {
-            var result = await _studentService.GetAllAsync ( );
+            var result = await _studentService.GetFilteredAsync ( search, page, pageSize );
+            
+            ViewBag.CurrentSearch = search;
 
             if ( result.IsSuccess )
                 return View ( result.Data );
-            
-            return View ( new List<StudentResponse> ( ) );
+           
+            return View ( new PaginatedResult<StudentResponse> ( new List<StudentResponse> ( ), 0, 1, pageSize ) );
         }
+
+
 
         [HttpGet]
         public IActionResult Create ( )

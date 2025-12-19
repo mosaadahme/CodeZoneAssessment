@@ -1,4 +1,6 @@
-﻿@model IEnumerable<CodeZone.Core.DTOs.Students.StudentResponse>
+﻿@using CodeZone.Core.Common
+@using CodeZone.Core.DTOs.Students
+@model PaginatedResult<StudentResponse>
 
 @{
     ViewData ["Title"] = "Students List";
@@ -19,13 +21,30 @@
     </div>
 }
 
-@if ( TempData ["ErrorMessage"] != null )
-{
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        @TempData ["ErrorMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+<div class="card shadow-sm mb-4">
+    <div class="card-body p-3">
+        <form asp-action="Index" method="get" class="row g-2 align-items-center">
+            <div class="col-auto flex-grow-1">
+                <div class="input-group">
+                    <span class="input-group-text bg-white text-muted"><i class="bi bi-search"></i></span>
+                    <input type="text" name="search" class="form-control border-start-0 ps-0"
+                           placeholder="Search by Name, Email, or National ID..."
+                           value="@ViewBag.CurrentSearch">
+                </div>
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-primary px-4" type="submit">Search</button>
+            </div>
+
+            @if ( !string.IsNullOrEmpty( ViewBag.CurrentSearch ) )
+            {
+                <div class="col-auto">
+                    <a asp-action="Index" class="btn btn-outline-secondary">Clear</a>
+                </div>
+            }
+        </form>
     </div>
-}
+</div>
 
 <div class="card shadow-sm">
     <div class="card-body">
@@ -41,9 +60,9 @@
                 </tr>
             </thead>
             <tbody>
-                @if ( Model != null && Model.Any( ) )
+                @if ( Model != null && Model.Data.Any( ) )
                 {
-                    foreach ( var student in Model )
+                    foreach ( var student in Model.Data )
                     {
                         <tr>
                             <td>@student.FullName</td>
@@ -56,9 +75,8 @@
                                     <a asp-action="Edit" asp-route-id="@student.Id" class="btn btn-sm btn-outline-warning">
                                         Edit
                                     </a>
-
                                     <form asp-action="Delete" asp-route-id="@student.Id" method="post"
-                                          onsubmit="return confirm('Are you sure you want to delete this student?');">
+                                          onsubmit="return confirm('Are you sure?');">
                                         <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
                                     </form>
                                 </div>
@@ -69,12 +87,40 @@
                 else
                 {
                     <tr>
-                        <td colspan="6" class="text-center text-muted py-4">
-                            No students found. Start by adding one!
+                        <td colspan="6" class="text-center text-muted py-5">
+                            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                            No students found matching your search.
                         </td>
                     </tr>
                 }
             </tbody>
         </table>
+
+        @if ( Model != null && Model.TotalPages > 1 )
+        {
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+
+                    <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index"
+                           asp-route-page="@(Model.CurrentPage - 1)"
+                           asp-route-search="@ViewBag.CurrentSearch">Previous</a>
+                    </li>
+
+                    <li class="page-item disabled">
+                        <span class="page-link bg-light text-dark">
+                            Page @Model.CurrentPage of @Model.TotalPages
+                        </span>
+                    </li>
+
+                    <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index"
+                           asp-route-page="@(Model.CurrentPage + 1)"
+                           asp-route-search="@ViewBag.CurrentSearch">Next</a>
+                    </li>
+
+                </ul>
+            </nav>
+        }
     </div>
 </div>

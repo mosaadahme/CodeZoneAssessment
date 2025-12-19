@@ -4,6 +4,7 @@ using CodeZone.Core.DTOs.Students;
 using CodeZone.Core.Entities;
 using CodeZone.Core.Interfaces;
 using FluentValidation;
+using System.Linq.Expressions;
 
 namespace CodeZone.Services.Students
 {
@@ -26,7 +27,23 @@ namespace CodeZone.Services.Students
             return await base.AddAsync ( request );
         }
 
-         public override async Task<Result> UpdateAsync ( StudentUpdateRequest request )
+
+        public async Task<Result<PaginatedResult<StudentResponse>>> GetFilteredAsync ( string search, int pageNumber, int pageSize )
+        {
+            Expression<Func<Student, bool>> filter = null;
+            if ( !string.IsNullOrEmpty ( search ) )
+            {
+                search = search.Trim().ToLower ( );
+                filter = x => x.FullName.ToLower ( ).Contains ( search )
+                           || x.Email.ToLower ( ).Contains ( search )
+                           || x.NationalId.Contains ( search );
+            }
+
+            return await GetPaginatedListAsync ( filter, pageNumber, pageSize );
+        }
+
+
+        public override async Task<Result> UpdateAsync ( StudentUpdateRequest request )
         {
             var emailExists = await _unitOfWork.Repository<Student> ( )
                 .AnyAsync ( s => s.Email == request.Email && s.Id != request.Id );

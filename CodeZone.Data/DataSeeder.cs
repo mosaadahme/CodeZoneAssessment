@@ -1,4 +1,5 @@
-﻿using CodeZone.Core.Entities;
+﻿using Bogus;
+using CodeZone.Core.Entities;
 
 namespace CodeZone.Data
 {
@@ -8,12 +9,13 @@ namespace CodeZone.Data
         {
             if ( !context.Courses.Any ( ) )
             {
-                var courses = new List<Course>
-                {
-                    new Course { Title = "C# Fundamentals", Description = "Learn the basics of C#", MaxCapacity = 5 },
-                    new Course { Title = ".NET Core", Description = "Deep dive into .NET", MaxCapacity = 20 },
-                    new Course { Title = "SQL Server", Description = "Database design and optimization", MaxCapacity = 2 } 
-                };
+                var courseFaker = new Faker<Course> ( )
+                    .RuleFor ( c => c.Title, f => f.PickRandom ( new [] { "C# Advanced", "Entity Framework Core", "SQL Server Optimization", "React Basics", "Angular for .NET Devs", "Docker & Kubernetes", "Microservices Architecture", "Clean Architecture", "Design Patterns", "Cloud Computing with Azure" } ) )
+                    .RuleFor ( c => c.Description, f => f.Lorem.Sentence ( 5 ) )
+                    .RuleFor ( c => c.MaxCapacity, f => f.Random.Int ( 10, 50 ) );
+
+                // Generate 10 Courses
+                var courses = courseFaker.Generate ( 10 );
 
                 await context.Courses.AddRangeAsync ( courses );
                 await context.SaveChangesAsync ( );
@@ -21,11 +23,15 @@ namespace CodeZone.Data
 
             if ( !context.Students.Any ( ) )
             {
-                var students = new List<Student>
-                {
-                    new Student { FullName = "Ahmed Ali", Email = "ahmed@codezone.com", NationalId = "29901011234567", BirthDate = new DateTime(1999, 1, 1), PhoneNumber = "01000000001" },
-                    new Student { FullName = "Sara Hassan", Email = "sara@codezone.com", NationalId = "29805051234567", BirthDate = new DateTime(1998, 5, 5), PhoneNumber = "01100000002" }
-                };
+                 var studentFaker = new Faker<Student> ( "ar" )
+                    .RuleFor ( s => s.FullName, f => f.Name.FullName ( ) ) 
+                    .RuleFor ( s => s.Email, ( f, s ) => f.Internet.Email ( s.FullName ) ) 
+                    .RuleFor ( s => s.NationalId, f => f.Random.Replace ( "##############" ) )
+                    .RuleFor ( s => s.BirthDate, f => f.Date.Past ( 25, DateTime.Now.AddYears ( -18 ) ) )
+                    .RuleFor ( s => s.PhoneNumber, f => f.Phone.PhoneNumber ( "01#########" ) );
+
+                // Generate 50 Students
+                var students = studentFaker.Generate ( 50 );
 
                 await context.Students.AddRangeAsync ( students );
                 await context.SaveChangesAsync ( );
