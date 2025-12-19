@@ -6,4 +6,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CodeZone.Core\CodeZone.Core.csproj" />
+    <ProjectReference Include="..\CodeZone.Data\CodeZone.Data.csproj" />
+    <ProjectReference Include="..\CodeZone.Services\CodeZone.Services.csproj" />
+  </ItemGroup>
+
 </Project>
