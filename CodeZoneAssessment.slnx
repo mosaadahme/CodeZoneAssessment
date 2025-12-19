@@ -2,5 +2,6 @@
   <Project Path="CodeZone.Core/CodeZone.Core.csproj" />
   <Project Path="CodeZone.Data/CodeZone.Data.csproj" />
   <Project Path="CodeZone.Services/CodeZone.Services.csproj" />
+  <Project Path="CodeZone.Tests/CodeZone.Tests.csproj" Id="b081c4b2-7424-4975-a5e3-d29cb67e6c11" />
   <Project Path="CodeZone.Web/CodeZone.Web.csproj" />
 </Solution>
