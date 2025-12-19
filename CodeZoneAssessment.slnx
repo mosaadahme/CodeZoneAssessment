@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="CodeZone.Core/CodeZone.Core.csproj" />
+  <Project Path="CodeZone.Data/CodeZone.Data.csproj" />
+  <Project Path="CodeZone.Services/CodeZone.Services.csproj" />
+  <Project Path="CodeZone.Web/CodeZone.Web.csproj" />
+</Solution>
