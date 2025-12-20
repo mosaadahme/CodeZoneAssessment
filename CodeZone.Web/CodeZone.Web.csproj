@@ -10,6 +10,10 @@
 
 		<ImplicitUsings>enable</ImplicitUsings>
 
+		<UserSecretsId>7981bc1b-08a2-4f7f-892c-8f7aa8b89fd0</UserSecretsId>
+
+		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+
 	</PropertyGroup> 
 
 	<ItemGroup>
@@ -19,6 +23,8 @@
 		<PackageReference Include="FluentValidation" Version="12.1.1" />
 
 		<PackageReference Include="FluentValidation.AspNetCore" Version="11.3.1" />
+
+		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0" />
 
 	</ItemGroup>
 
