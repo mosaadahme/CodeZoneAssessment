@@ -7,6 +7,7 @@ namespace CodeZone.Core.Interfaces
     {
         Task<Result<IEnumerable<StudentResponse>>> GetAllAsync ( );
         Task<Result<PaginatedResult<StudentResponse>>> GetFilteredAsync ( string search, int pageNumber, int pageSize );
+        Task<List<string>> GetEnrolledCoursesAsync ( int studentId );
         Task<Result<StudentResponse>> GetByIdAsync ( int id );
         Task<Result> AddAsync ( StudentAddRequest request );
         Task<Result> UpdateAsync ( StudentUpdateRequest request );

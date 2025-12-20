@@ -17,18 +17,6 @@ namespace CodeZone.Web.Controllers
             _mapper = mapper;
         }
 
-        //[HttpGet]
-        //public async Task<IActionResult> Index ( )
-        //{
-        //    var result = await _studentService.GetAllAsync ( );
-
-        //    if ( result.IsSuccess )
-        //        return View ( result.Data );
-
-        //    return View ( new List<StudentResponse> ( ) );
-        //}
-
-
         [HttpGet]
         public async Task<IActionResult> Index ( string search = "", int page = 1, int pageSize = 5 )
         {
@@ -68,6 +56,14 @@ namespace CodeZone.Web.Controllers
             ModelState.AddModelError ( string.Empty, result.ErrorMessage );
             return View ( request );
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetCourses ( int id )
+        {
+            var courses = await _studentService.GetEnrolledCoursesAsync ( id );
+            return Json ( courses );
+        }
+
 
         [HttpGet]
         public async Task<IActionResult> Edit ( int id )

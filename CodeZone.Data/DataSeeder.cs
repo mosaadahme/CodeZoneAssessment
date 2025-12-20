@@ -14,7 +14,6 @@ namespace CodeZone.Data
                     .RuleFor ( c => c.Description, f => f.Lorem.Sentence ( 5 ) )
                     .RuleFor ( c => c.MaxCapacity, f => f.Random.Int ( 10, 50 ) );
 
-                // Generate 10 Courses
                 var courses = courseFaker.Generate ( 10 );
 
                 await context.Courses.AddRangeAsync ( courses );
@@ -30,7 +29,6 @@ namespace CodeZone.Data
                     .RuleFor ( s => s.BirthDate, f => f.Date.Past ( 25, DateTime.Now.AddYears ( -18 ) ) )
                     .RuleFor ( s => s.PhoneNumber, f => f.Phone.PhoneNumber ( "01#########" ) );
 
-                // Generate 50 Students
                 var students = studentFaker.Generate ( 50 );
 
                 await context.Students.AddRangeAsync ( students );

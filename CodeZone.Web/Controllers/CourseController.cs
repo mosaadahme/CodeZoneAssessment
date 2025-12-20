@@ -21,6 +21,13 @@ namespace CodeZone.Web.Controllers
             var result = await _courseService.GetAllAsync ( );
             return View ( result.Data ?? new List<CourseResponse> ( ) );
         }
+        
+        [HttpGet]
+        public async Task<IActionResult> GetStudents ( int id )
+        {
+            var students = await _courseService.GetEnrolledStudentsAsync ( id );
+            return Json ( students );
+        }
 
         [HttpGet]
         public IActionResult Create ( )

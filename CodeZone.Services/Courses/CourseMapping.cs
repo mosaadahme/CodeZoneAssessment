@@ -18,6 +18,9 @@ namespace CodeZone.Services.Courses
             CreateMap<CourseUpdateRequest, Course> ( );
 
             CreateMap<CourseResponse, CourseUpdateRequest> ( );
+
+            CreateMap<Course, CourseResponse> ( )
+    .ForMember ( dest => dest.EnrollmentsCount, opt => opt.MapFrom ( src => src.Enrollments.Count ) );
         }
     }
 }

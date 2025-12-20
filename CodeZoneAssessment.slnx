@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="README.md" />
+  </Folder>
   <Project Path="CodeZone.Core/CodeZone.Core.csproj" />
   <Project Path="CodeZone.Data/CodeZone.Data.csproj" />
   <Project Path="CodeZone.Services/CodeZone.Services.csproj" />

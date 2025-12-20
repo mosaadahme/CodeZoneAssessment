@@ -2,7 +2,7 @@
 using CodeZone.Core.Entities;
 using CodeZone.Core.Interfaces;
 using CodeZone.Services.Enrollments;
-using FluentValidation; 
+using FluentValidation;
 using FluentValidation.Results;
 using Moq;
 using Xunit;
@@ -31,7 +31,7 @@ namespace CodeZone.Tests
             _mockValidator = new Mock<IValidator<EnrollmentRequest>> ( );
 
             _mockValidator.Setup ( v => v.ValidateAsync ( It.IsAny<EnrollmentRequest> ( ), It.IsAny<CancellationToken> ( ) ) )
-                          .ReturnsAsync ( new ValidationResult ( ) ); 
+                          .ReturnsAsync ( new ValidationResult ( ) );
 
             _mockUnitOfWork.Setup ( u => u.Repository<Student> ( ) ).Returns ( _mockStudentRepo.Object );
             _mockUnitOfWork.Setup ( u => u.Repository<Course> ( ) ).Returns ( _mockCourseRepo.Object );
@@ -62,6 +62,27 @@ namespace CodeZone.Tests
 
             _mockEnrollmentRepo.Verify ( r => r.AddAsync ( It.IsAny<Enrollment> ( ) ), Times.Once ( ) );
             _mockUnitOfWork.Verify ( u => u.CompleteAsync ( ), Times.Once ( ) );
+        }
+
+        [Fact]
+        public async Task EnrollStudentAsync_ShouldReturnFailure_WhenCourseIsFull ( )
+        {
+            var studentId = 1;
+            var courseId = 102;
+            var request = new EnrollmentRequest { StudentId = studentId, CourseId = courseId };
+
+            var fullEnrollments = Enumerable.Range ( 1, 10 ).Select ( i => new Enrollment ( ) ).ToList ( );
+            var course = new Course { Id = courseId, Title = "Full Course", MaxCapacity = 10, Enrollments = fullEnrollments };
+
+            _mockCourseRepo.Setup ( r => r.GetByIdAsync ( courseId ) ).ReturnsAsync ( course );
+
+
+            var result = await _enrollmentService.EnrollStudentAsync ( request );
+
+            Assert.False ( result.IsSuccess );
+            Assert.Equal ( "Course is full.", result.ErrorMessage );
+
+            _mockEnrollmentRepo.Verify ( r => r.AddAsync ( It.IsAny<Enrollment> ( ) ), Times.Never ( ) );
         }
     }
 }

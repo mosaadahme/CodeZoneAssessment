@@ -37,6 +37,7 @@ builder.Services.AddFluentValidationAutoValidation ( );
 builder.Services.AddValidatorsFromAssemblyContaining<StudentService> ( );
 
 var app = builder.Build ( );
+app.UseMiddleware<CodeZone.Web.Middlewares.ExceptionMiddleware> ( );
 
 using ( var scope = app.Services.CreateScope ( ) )
 {
